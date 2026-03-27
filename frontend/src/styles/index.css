@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;500;700&display=swap');
+
+body {
+  font-family: 'Lato', sans-serif;
+  color: #2d2d2d;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+}
+
+.btn-primary {
+  @apply bg-olive-dark text-white px-6 py-2 rounded transition hover:bg-olive;
+}
+
+.btn-secondary {
+  @apply bg-beige text-olive-dark px-6 py-2 rounded transition hover:bg-opacity-80;
+}
+
+.btn-outline {
+  @apply border-2 border-olive-dark text-olive-dark px-6 py-2 rounded transition hover:bg-olive-dark hover:text-white;
+}
+
+.luxury-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #3b5d3b;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  color: #3b5d3b;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease-in;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

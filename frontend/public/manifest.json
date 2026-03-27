@@ -1,0 +1,17 @@
+{
+  "short_name": "KRUTHANYA",
+  "name": "KRUTHANYA - Premium Sarees",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%233b5d3b' width='192' height='192'/><text x='96' y='120' font-size='80' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>K</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#3b5d3b",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#3b5d3b",
+  "description": "Premium saree e-commerce platform"
+}
