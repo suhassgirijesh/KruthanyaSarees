@@ -1,94 +1,20 @@
-const mongoose = require('mongoose');
+const express = require("express");
+const router = express.Router();
+const Product = require("../models/Product");
 
-const ProductSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
-  category: {
-    type: String,
-    enum: [
-      'Silk Sarees',
-      'Cotton Sarees',
-      'Wedding Sarees',
-      'Designer Sarees',
-      'Party Wear Sarees',
-      'Traditional Sarees'
-    ],
-    required: true
-  },
-  price: {
-    type: Number,
-    required: true
-  },
-  discount: {
-    type: Number,
-    default: 0
-  },
-  fabricType: {
-    type: String,
-    required: true
-  },
-  color: {
-    type: String,
-    required: true
-  },
-  size: [{
-    type: String,
-    enum: ['One Size', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
-  }],
-  images: [{
-    type: String
-  }],
-  stock: {
-    type: Number,
-    default: 0
-  },
-  rating: {
-    type: Number,
-    default: 0
-  },
-  reviews: [{
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    userName: String,
-    rating: Number,
-    comment: String,
-    createdAt: {
-      type: Date,
-      default: Date.now
-    }
-  }],
-  isFeatured: {
-    type: Boolean,
-    default: false
-  },
-  isTrending: {
-    type: Boolean,
-    default: false
-  },
-  isNewArrival: {
-    type: Boolean,
-    default: false
-  },
-  isBestSeller: {
-    type: Boolean,
-    default: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
+// TEST ROUTE (check if route works)
+router.get("/test", (req, res) => {
+  res.json({ message: "Products route working ✅" });
+});
+
+// GET ALL PRODUCTS
+router.get("/", async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
-module.exports = mongoose.model('Product', ProductSchema);
+module.exports = router;
