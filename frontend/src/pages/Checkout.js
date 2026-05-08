@@ -97,7 +97,7 @@ const Checkout = () => {
     try {
 
       const orderResponse = await api.post(
-        '/orders',
+        '/api/orders',
         {
           shippingAddress: { ...user, ...address },
           paymentMethod,
@@ -123,7 +123,7 @@ const Checkout = () => {
           }
 
           const paymentResponse = await api.post(
-            '/payment/create-order',
+            '/api/orders/create-order',
             {
               amount: orderResponse.data.order.totalPrice,
               orderId
@@ -141,9 +141,9 @@ const Checkout = () => {
 
           const options = {
 
-            key: "rzp_test_SmusDkRMM1b5Mp",
+            key: process.env.REACT_APP_RAZORPAY_KEY_ID || "rzp_test_SmusDkRMM1b5Mp",
 
-            amount: paymentResponse.data.order.amount,
+            amount: paymentResponse.data.amount,
 
             currency: "INR",
 
@@ -151,7 +151,7 @@ const Checkout = () => {
 
             description: "Saree Purchase",
 
-            order_id: paymentResponse.data.order.id,
+            order_id: paymentResponse.data.razorpayOrderId,
 
             prefill: {
               name: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
@@ -168,7 +168,7 @@ const Checkout = () => {
               try {
 
                 await api.post(
-                  '/payment/verify',
+                  '/api/orders/verify',
                   {
                     orderId,
                     razorpayOrderId: response.razorpay_order_id,

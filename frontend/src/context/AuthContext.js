@@ -24,7 +24,9 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const response = await api.get('/auth/me');
+        const response = await api.get('/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         if (response.data.success) {
           setUser(response.data.user);
           localStorage.setItem('user', JSON.stringify(response.data.user));

@@ -34,7 +34,7 @@ const Profile = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const response = await api.put('/users/profile', formData, {
+      const response = await api.put('/api/users/profile', formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {

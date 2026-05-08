@@ -30,7 +30,7 @@ const Admin = () => {
 
   const fetchDashboard = useCallback(async () => {
     try {
-      const response = await api.get('/admin/dashboard/stats', { headers: { Authorization: `Bearer ${token}` } });
+      const response = await api.get('/api/admin/dashboard/stats', { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) setStats(response.data.stats);
     } catch (error) {
       console.error('Error fetching dashboard:', error);
@@ -39,7 +39,7 @@ const Admin = () => {
 
   const fetchProducts = useCallback(async () => {
     try {
-      const response = await api.get('/products');
+      const response = await api.get('/api/products');
       if (response.data.success) setProducts(response.data.products);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -48,7 +48,7 @@ const Admin = () => {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const response = await api.get('/admin/orders', { headers: { Authorization: `Bearer ${token}` } });
+      const response = await api.get('/api/admin/orders', { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) setOrders(response.data.orders);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -57,7 +57,7 @@ const Admin = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const response = await api.get('/admin/users', { headers: { Authorization: `Bearer ${token}` } });
+      const response = await api.get('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) setUsers(response.data.users);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -101,8 +101,8 @@ const Admin = () => {
       const payload = buildPayload();
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const response = editingId
-        ? await api.put(`/admin/products/${editingId}`, payload, config)
-        : await api.post('/admin/products', payload, config);
+        ? await api.put(`/api/admin/products/${editingId}`, payload, config)
+        : await api.post('/api/admin/products', payload, config);
 
       if (response.data.success) {
         resetForm();
@@ -134,7 +134,7 @@ const Admin = () => {
   const handleDeleteProduct = async (id) => {
     if (!window.confirm('Delete this product?')) return;
     try {
-      const response = await api.delete(`/admin/products/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await api.delete(`/api/admin/products/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) {
         fetchProducts();
         fetchDashboard();
@@ -146,7 +146,7 @@ const Admin = () => {
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
-      const response = await api.put(`/admin/orders/${orderId}/status`, { orderStatus: newStatus }, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await api.put(`/api/admin/orders/${orderId}/status`, { orderStatus: newStatus }, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) {
         fetchOrders();
         fetchDashboard();

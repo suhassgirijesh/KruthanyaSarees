@@ -29,7 +29,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await api.post('/auth/login', formData);
+      const response = await api.post('/api/auth/login', formData);
       if (response.data.success) {
         login(response.data.user, response.data.token);
         navigate(from, { replace: true });

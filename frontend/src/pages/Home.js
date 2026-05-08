@@ -8,10 +8,10 @@ const Home = () => {
     <div>
       <HeroBanner />
       <Features />
-      <ProductGrid title="Featured Collection" endpoint="/products/featured" />
-      <ProductGrid title="Trending Sarees" endpoint="/products/trending" />
-      <ProductGrid title="New Arrivals" endpoint="/products/new-arrivals" />
-      <ProductGrid title="Best Sellers" endpoint="/products/best-sellers" />
+      <ProductGrid title="Featured Collection" endpoint="/api/products/featured" />
+      <ProductGrid title="Trending Sarees" endpoint="/api/products/trending" />
+      <ProductGrid title="New Arrivals" endpoint="/api/products/new-arrivals" />
+      <ProductGrid title="Best Sellers" endpoint="/api/products/best-sellers" />
     </div>
   );
 };

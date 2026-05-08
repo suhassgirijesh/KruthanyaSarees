@@ -27,7 +27,7 @@ export const CartProvider = ({ children }) => {
   const fetchCart = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get('/cart', {
+      const response = await api.get('/api/cart', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -57,7 +57,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       const response = await api.post(
-        '/cart/add',
+        '/api/cart/add',
         { productId, quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -73,7 +73,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (productId) => {
     try {
       const id = getProductId(productId);
-      const response = await api.delete(`/cart/remove/${id}`, {
+      const response = await api.delete(`/api/cart/remove/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -89,7 +89,7 @@ export const CartProvider = ({ children }) => {
     try {
       const id = getProductId(productId);
       const response = await api.put(
-        `/cart/update/${id}`,
+        `/api/cart/update/${id}`,
         { quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -104,7 +104,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = async () => {
     try {
-      const response = await api.delete('/cart/clear', {
+      const response = await api.delete('/api/cart/clear', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {

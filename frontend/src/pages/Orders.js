@@ -12,7 +12,7 @@ const Orders = () => {
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get('/orders/my', {
+      const response = await api.get('/api/orders/my', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {

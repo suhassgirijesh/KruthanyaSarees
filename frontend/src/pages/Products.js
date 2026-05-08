@@ -47,7 +47,7 @@ const Products = () => {
       if (filters.search) params.append('search', filters.search);
       if (filters.sort) params.append('sort', filters.sort);
 
-      const response = await api.get(`/products?${params}`);
+      const response = await api.get(`/api/products?${params}`);
       if (response.data.success) {
         setProducts(response.data.products);
       }
