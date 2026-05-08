@@ -9,9 +9,20 @@ const app = express();
 
 
 // ======================
+// CORS
+// ======================
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://kruthanya-sarees.vercel.app"
+  ],
+  credentials: true
+}));
+
+
+// ======================
 // MIDDLEWARE
 // ======================
-app.use(cors());
 app.use(express.json());
 
 
