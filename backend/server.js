@@ -12,10 +12,7 @@ const app = express();
 // CORS
 // ======================
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://kruthanya-sarees.vercel.app"
-  ],
+  origin: true,
   credentials: true
 }));
 
