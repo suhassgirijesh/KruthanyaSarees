@@ -196,7 +196,7 @@ KRUTHANYA/
    ```bash
    npm run dev
    ```
-   Server will run on `http://localhost:5000`
+   Server will run on `http://${process.env.react_app_api_url}\`
 
 ### Frontend Setup
 
@@ -212,7 +212,7 @@ KRUTHANYA/
 
 3. **Create .env file**
    ```bash
-   echo "REACT_APP_API_URL=http://localhost:5000/api
+   echo "REACT_APP_API_URL=http://${process.env.react_app_api_url}\/api
    REACT_APP_RAZORPAY_KEY_ID=your_razorpay_key_id" > .env
    ```
 

@@ -51,7 +51,7 @@ fi
 if [ ! -f ".env" ]; then
     echo "Creating .env file..."
     cat > .env << EOF
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://${process.env.react_app_api_url}\/api
 REACT_APP_RAZORPAY_KEY_ID=your_razorpay_key_id
 EOF
     echo -e "${YELLOW}⚠️  Please update frontend/.env with your Razorpay key${NC}"

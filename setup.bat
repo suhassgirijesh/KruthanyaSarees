@@ -49,7 +49,7 @@ if not exist "node_modules" (
 if not exist ".env" (
     echo Creating .env file...
     (
-        echo REACT_APP_API_URL=http://localhost:5000/api
+        echo REACT_APP_API_URL=http://${process.env.react_app_api_url}\/api
         echo REACT_APP_RAZORPAY_KEY_ID=your_razorpay_key_id
     ) > .env
     echo ⚠️  Please update frontend\.env with your Razorpay key

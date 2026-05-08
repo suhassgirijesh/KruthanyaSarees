@@ -119,7 +119,7 @@ setup.bat
 cd backend
 npm run dev
 ```
-**Runs on:** http://localhost:5000
+**Runs on:** http://${process.env.react_app_api_url}\
 
 ### 3. Start Frontend
 ```bash
@@ -297,7 +297,7 @@ FRONTEND_URL=http://localhost:3000
 
 ### Frontend .env
 ```
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://${process.env.react_app_api_url}\/api
 REACT_APP_RAZORPAY_KEY_ID=your_key
 ```
 
