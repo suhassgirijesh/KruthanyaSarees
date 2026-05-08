@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import api from '../utils/api';
 
@@ -18,14 +18,13 @@ export const CartProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const { token, isAuthenticated } = useAuth();
 
-  // Fetch cart from server
-  useEffect(() => {
-    if (isAuthenticated && token) {
-      fetchCart();
-    }
-  }, [isAuthenticated, token]);
+  const getProductId = (itemOrProductId) => {
+    if (typeof itemOrProductId === 'string') return itemOrProductId;
+    return itemOrProductId?._id || itemOrProductId?.productId?._id || itemOrProductId?.productId;
+  };
 
-  const fetchCart = async () => {
+  // Fetch cart from server
+  const fetchCart = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get('/cart', {
@@ -37,10 +36,18 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Error fetching cart:', error);
+      setCartItems([]);
+      setCartTotal(0);
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      fetchCart();
+    }
+  }, [fetchCart, isAuthenticated, token]);
 
   const addToCart = async (productId, quantity = 1) => {
     if (!isAuthenticated) {
@@ -65,7 +72,8 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = async (productId) => {
     try {
-      const response = await api.delete(`/cart/remove/${productId}`, {
+      const id = getProductId(productId);
+      const response = await api.delete(`/cart/remove/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -79,8 +87,9 @@ export const CartProvider = ({ children }) => {
 
   const updateQuantity = async (productId, quantity) => {
     try {
+      const id = getProductId(productId);
       const response = await api.put(
-        `/cart/update/${productId}`,
+        `/cart/update/${id}`,
         { quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -107,7 +116,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const cartCount = cartItems.length;
+  const cartCount = cartItems.reduce((count, item) => count + Number(item.quantity || 0), 0);
 
   return (
     <CartContext.Provider

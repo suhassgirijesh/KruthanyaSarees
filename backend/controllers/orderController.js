@@ -26,6 +26,9 @@ const createOrder = async (req, res) => {
       });
     }
 
+    const taxableTotal = cart.totalPrice;
+    const totalPrice = Math.round((taxableTotal + (taxableTotal * 18) / 100) * 100) / 100;
+
     const order = new Order({
       userId,
       items: cart.items.map(item => ({
@@ -35,7 +38,7 @@ const createOrder = async (req, res) => {
         price: item.price,
         discount: item.discount
       })),
-      totalPrice: cart.totalPrice,
+      totalPrice,
       shippingAddress,
       paymentMethod,
       notes,
@@ -83,6 +86,7 @@ const createPaymentOrder = async (req, res) => {
 
     res.json({
       success: true,
+      razorpayOrderId: razorpayOrder.id,
       orderId: razorpayOrder.id,
       amount: razorpayOrder.amount,
       currency: razorpayOrder.currency
@@ -100,27 +104,40 @@ const createPaymentOrder = async (req, res) => {
 const verifyPayment = async (req, res) => {
   try {
 
-    const { orderId, paymentId, signature } = req.body;
+    const {
+      orderId,
+      paymentId,
+      signature,
+      razorpayOrderId,
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature
+    } = req.body;
 
-    const body = orderId + "|" + paymentId;
+    const mongoOrderId = orderId;
+    const rpOrderId = razorpayOrderId || razorpay_order_id;
+    const rpPaymentId = paymentId || razorpay_payment_id;
+    const rpSignature = signature || razorpay_signature;
+
+    const body = rpOrderId + "|" + rpPaymentId;
 
     const expectedSignature = require("crypto")
       .createHmac("sha256", process.env.RAZORPAY_SECRET || "test")
       .update(body)
       .digest("hex");
 
-    if (expectedSignature !== signature) {
+    if (expectedSignature !== rpSignature) {
       return res.status(400).json({
         success: false,
         message: "Payment verification failed"
       });
     }
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(mongoOrderId);
 
     if (order) {
       order.paymentStatus = "completed";
-      order.paymentId = paymentId;
+      order.paymentId = rpPaymentId;
       order.orderStatus = "confirmed";
       await order.save();
 

@@ -1,14 +1,103 @@
-const express = require("express");
-const router = express.Router();
+const mongoose = require("mongoose");
 
-// TEST ROUTE
-router.get("/test", (req, res) => {
-  res.json({ message: "Products route working ✅" });
-});
+const productSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true
+    },
 
-// MAIN ROUTE
-router.get("/", (req, res) => {
-  res.json({ message: "Products API working 🔥" });
-});
+    description: {
+      type: String
+    },
 
-module.exports = router;
+    category: {
+      type: String
+    },
+
+    price: {
+      type: Number,
+      required: true
+    },
+
+    discount: {
+      type: Number,
+      default: 0
+    },
+
+    fabricType: {
+      type: String
+    },
+
+    color: {
+      type: String
+    },
+
+    size: [
+      {
+        type: String
+      }
+    ],
+
+    images: [
+      {
+        type: String
+      }
+    ],
+
+    stock: {
+      type: Number,
+      default: 0
+    },
+
+    rating: {
+      type: Number,
+      default: 0
+    },
+
+    reviews: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User"
+        },
+        userName: String,
+        rating: {
+          type: Number,
+          min: 1,
+          max: 5
+        },
+        comment: String,
+        createdAt: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ],
+
+    isFeatured: {
+      type: Boolean,
+      default: false
+    },
+
+    isTrending: {
+      type: Boolean,
+      default: false
+    },
+
+    isNewArrival: {
+      type: Boolean,
+      default: false
+    },
+
+    isBestSeller: {
+      type: Boolean,
+      default: false
+    }
+  },
+  {
+    timestamps: true
+  }
+);
+
+module.exports = mongoose.model("Product", productSchema);

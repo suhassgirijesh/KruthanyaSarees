@@ -6,50 +6,75 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
 
-if (!MONGO_URI) {
-  console.error('Missing MongoDB connection string. Set MONGO_URI or MONGODB_URI in .env');
-  process.exit(1);
-}
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
-}));
+// ======================
+// MIDDLEWARE
+// ======================
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('MongoDB connected ✅'))
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
 
-app.use('/api/products', require('./routes/products'));
-console.log('Mounted /api/products routes');
+// ======================
+// MONGODB CONNECTION
+// ======================
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected ✅"))
+  .catch((err) => console.log("MongoDB error:", err));
 
-app.get('/', (req, res) => {
-  res.send('Server running 🚀');
+
+// ======================
+// ROUTES IMPORT
+// ======================
+const productRoutes = require("./routes/products");
+const authRoutes = require("./routes/auth");
+const cartRoutes = require("./routes/cart");
+const orderRoutes = require("./routes/orders");
+const paymentRoutes = require("./routes/payment");
+const userRoutes = require("./routes/users");
+const adminRoutes = require("./routes/admin");
+
+
+// ======================
+// API ROUTES
+// ======================
+app.use("/api/products", productRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
+
+
+// ======================
+// TEST ROOT
+// ======================
+app.get("/", (req, res) => {
+  res.send("KRUTHANYA SAREES API is running 🚀");
 });
 
-app.use((req, res, next) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
-});
 
+// ======================
+// ERROR HANDLER
+// ======================
 app.use((err, req, res, next) => {
-  console.error('Server Error:', err);
+
+  console.error("SERVER ERROR:", err);
+
   res.status(500).json({
     success: false,
-    message: err.message || 'Server error'
+    message: "Server Error"
   });
+
 });
 
+
+// ======================
+// START SERVER
+// ======================
+const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT} 🚀`);
 });

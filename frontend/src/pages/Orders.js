@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { formatPrice } from '../utils/helpers';
@@ -9,14 +9,10 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get('/orders', {
+      const response = await api.get('/orders/my', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -27,7 +23,11 @@ const Orders = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -45,22 +45,22 @@ const Orders = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cream py-12">
+    <div className="min-h-screen luxury-surface py-12">
       <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-3xl font-luxury text-olive-dark mb-8">My Orders</h1>
+        <h1 className="text-3xl font-luxury text-gold-soft mb-8">My Orders</h1>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-lg p-12 text-center">
-            <p className="text-gray-600 text-lg mb-4">You haven't placed any orders yet.</p>
+          <div className="glass-panel rounded-lg p-12 text-center">
+            <p className="text-soft-white/70 text-lg mb-4">You haven't placed any orders yet.</p>
           </div>
         ) : (
           <div className="space-y-4">
             {orders.map((order) => (
-              <div key={order._id} className="bg-white rounded-lg p-6">
+              <div key={order._id} className="glass-panel rounded-lg p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <p className="text-sm text-gray-600">Order ID: {order._id}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-soft-white/60">Order ID: {order._id}</p>
+                    <p className="text-sm text-soft-white/60">
                       Date: {new Date(order.orderDate).toLocaleDateString()}
                     </p>
                   </div>
@@ -71,14 +71,14 @@ const Orders = () => {
 
                 <div className="mb-4">
                   {order.items.map((item, idx) => (
-                    <p key={idx} className="text-gray-700">
+                    <p key={idx} className="text-soft-white/75">
                       {item.name} x {item.quantity} - {formatPrice(item.price * item.quantity)}
                     </p>
                   ))}
                 </div>
 
-                <div className="flex justify-between items-center border-t pt-4">
-                  <span className="font-bold text-lg text-olive-dark">
+                <div className="flex justify-between items-center border-t border-gold/20 pt-4">
+                  <span className="font-bold text-lg text-gold-soft">
                     Total: {formatPrice(order.totalPrice)}
                   </span>
                   <button
@@ -90,13 +90,13 @@ const Orders = () => {
                 </div>
 
                 {selectedOrder === order._id && (
-                  <div className="mt-4 pt-4 border-t space-y-2 text-sm">
-                    <h4 className="font-bold text-olive-dark">Shipping Address</h4>
+                  <div className="mt-4 pt-4 border-t border-gold/20 space-y-2 text-sm">
+                    <h4 className="font-bold text-gold-soft">Shipping Address</h4>
                     <p>
                       {order.shippingAddress.street}<br />
                       {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
                     </p>
-                    <h4 className="font-bold text-olive-dark mt-4">Payment Method</h4>
+                    <h4 className="font-bold text-gold-soft mt-4">Payment Method</h4>
                     <p>{order.paymentMethod === 'razorpay' ? 'Credit/Debit Card' : 'Cash on Delivery'}</p>
                   </div>
                 )}

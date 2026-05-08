@@ -92,16 +92,16 @@ const Footer = () => {
         {/* Social Media */}
         <div className="border-t border-opacity-30 border-white pt-8 pb-8">
           <div className="flex justify-center gap-6 mb-6">
-            <a href="#" className="text-white hover:text-beige transition text-2xl">
+            <a href="https://facebook.com" className="text-white hover:text-beige transition text-2xl" aria-label="Facebook">
               <FaFacebook />
             </a>
-            <a href="#" className="text-white hover:text-beige transition text-2xl">
+            <a href="https://instagram.com" className="text-white hover:text-beige transition text-2xl" aria-label="Instagram">
               <FaInstagram />
             </a>
-            <a href="#" className="text-white hover:text-beige transition text-2xl">
+            <a href="https://twitter.com" className="text-white hover:text-beige transition text-2xl" aria-label="Twitter">
               <FaTwitter />
             </a>
-            <a href="#" className="text-white hover:text-beige transition text-2xl">
+            <a href="https://linkedin.com" className="text-white hover:text-beige transition text-2xl" aria-label="LinkedIn">
               <FaLinkedin />
             </a>
           </div>
@@ -110,7 +110,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-opacity-30 border-white pt-6">
           <div className="text-center text-gray-300 text-sm">
-            <p>&copy; {new Date().getFullYear()} KRUTHANYA. All rights reserved. Made with ❤️ for saree lovers.</p>
+            <p>&copy; {new Date().getFullYear()} KRUTHANYA SAREES. All rights reserved.</p>
           </div>
         </div>
       </div>

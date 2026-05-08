@@ -76,7 +76,10 @@ const getProductById = async (req, res) => {
 
 const getFeaturedProducts = async (req, res) => {
   try {
-    const products = await Product.find({ isFeatured: true }).limit(8);
+    let products = await Product.find({ isFeatured: true }).limit(8);
+    if (products.length === 0) {
+      products = await Product.find().sort({ createdAt: -1 }).limit(8);
+    }
 
     res.json({
       success: true,
@@ -93,7 +96,10 @@ const getFeaturedProducts = async (req, res) => {
 
 const getTrendingProducts = async (req, res) => {
   try {
-    const products = await Product.find({ isTrending: true }).limit(8);
+    let products = await Product.find({ isTrending: true }).limit(8);
+    if (products.length === 0) {
+      products = await Product.find().sort({ rating: -1, createdAt: -1 }).limit(8);
+    }
 
     res.json({
       success: true,
@@ -110,7 +116,10 @@ const getTrendingProducts = async (req, res) => {
 
 const getNewArrivals = async (req, res) => {
   try {
-    const products = await Product.find({ isNewArrival: true }).sort({ createdAt: -1 }).limit(8);
+    let products = await Product.find({ isNewArrival: true }).sort({ createdAt: -1 }).limit(8);
+    if (products.length === 0) {
+      products = await Product.find().sort({ createdAt: -1 }).limit(8);
+    }
 
     res.json({
       success: true,
@@ -127,7 +136,10 @@ const getNewArrivals = async (req, res) => {
 
 const getBestSellers = async (req, res) => {
   try {
-    const products = await Product.find({ isBestSeller: true }).limit(8);
+    let products = await Product.find({ isBestSeller: true }).limit(8);
+    if (products.length === 0) {
+      products = await Product.find().sort({ stock: 1, createdAt: -1 }).limit(8);
+    }
 
     res.json({
       success: true,

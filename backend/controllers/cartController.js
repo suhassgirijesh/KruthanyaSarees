@@ -1,6 +1,18 @@
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 
+const calculateCartTotal = (items) => {
+  return items.reduce((total, item) => {
+    const itemPrice = item.price * item.quantity;
+    const discountAmount = (itemPrice * item.discount) / 100;
+    return total + (itemPrice - discountAmount);
+  }, 0);
+};
+
+const getPopulatedCart = (userId) => {
+  return Cart.findOne({ userId }).populate("items.productId");
+};
+
 const getCart = async (req, res) => {
   try {
 
@@ -84,22 +96,15 @@ const addToCart = async (req, res) => {
       });
     }
 
-    // Calculate total price
-    cart.totalPrice = cart.items.reduce((total, item) => {
-
-      const itemPrice = item.price * item.quantity;
-      const discountAmount = (itemPrice * item.discount) / 100;
-
-      return total + (itemPrice - discountAmount);
-
-    }, 0);
+    cart.totalPrice = calculateCartTotal(cart.items);
 
     await cart.save();
+    const populatedCart = await getPopulatedCart(userId);
 
     res.json({
       success: true,
       message: "Product added to cart",
-      cart
+      cart: populatedCart
     });
 
   } catch (error) {
@@ -134,22 +139,15 @@ const removeFromCart = async (req, res) => {
       item => item.productId.toString() !== productId.toString()
     );
 
-    // Recalculate total
-    cart.totalPrice = cart.items.reduce((total, item) => {
-
-      const itemPrice = item.price * item.quantity;
-      const discountAmount = (itemPrice * item.discount) / 100;
-
-      return total + (itemPrice - discountAmount);
-
-    }, 0);
+    cart.totalPrice = calculateCartTotal(cart.items);
 
     await cart.save();
+    const populatedCart = await getPopulatedCart(userId);
 
     res.json({
       success: true,
       message: "Product removed from cart",
-      cart
+      cart: populatedCart
     });
 
   } catch (error) {
@@ -168,7 +166,7 @@ const removeFromCart = async (req, res) => {
 const updateCartItem = async (req, res) => {
   try {
 
-    const { productId } = req.params;
+    const productId = req.params.productId || req.params.id || req.body.productId;
     const { quantity } = req.body;
     const userId = req.user.id;
 
@@ -203,22 +201,15 @@ const updateCartItem = async (req, res) => {
 
     cart.items[itemIndex].quantity = qty;
 
-    // Recalculate total
-    cart.totalPrice = cart.items.reduce((total, item) => {
-
-      const itemPrice = item.price * item.quantity;
-      const discountAmount = (itemPrice * item.discount) / 100;
-
-      return total + (itemPrice - discountAmount);
-
-    }, 0);
+    cart.totalPrice = calculateCartTotal(cart.items);
 
     await cart.save();
+    const populatedCart = await getPopulatedCart(userId);
 
     res.json({
       success: true,
       message: "Cart updated",
-      cart
+      cart: populatedCart
     });
 
   } catch (error) {

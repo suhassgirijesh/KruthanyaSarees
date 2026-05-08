@@ -1,7 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FaEdit, FaPlus, FaSave, FaTimes, FaTrash } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import { formatPrice } from '../utils/helpers';
+
+const emptyProduct = {
+  name: '',
+  description: '',
+  category: 'Silk Sarees',
+  price: '',
+  discount: '0',
+  fabricType: '',
+  color: '',
+  images: '',
+  stock: '',
+  size: 'Free Size'
+};
 
 const Admin = () => {
   const { token, isAdmin } = useAuth();
@@ -9,325 +23,261 @@ const Admin = () => {
   const [stats, setStats] = useState(null);
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showAddProduct, setShowAddProduct] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: 'Silk Sarees',
-    price: '',
-    discount: '0',
-    fabricType: '',
-    color: '',
-    stock: ''
-  });
+  const [users, setUsers] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState(emptyProduct);
 
-  useEffect(() => {
-    if (!isAdmin) {
-      window.location.href = '/';
-      return;
-    }
-    fetchDashboard();
-    fetchProducts();
-    fetchOrders();
-  }, []);
-
-  const fetchDashboard = async () => {
+  const fetchDashboard = useCallback(async () => {
     try {
-      const response = await api.get('/admin/dashboard/stats', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.data.success) {
-        setStats(response.data.stats);
-      }
+      const response = await api.get('/admin/dashboard/stats', { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) setStats(response.data.stats);
     } catch (error) {
       console.error('Error fetching dashboard:', error);
     }
-  };
+  }, [token]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
-      const response = await api.get('/products', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.data.success) {
-        setProducts(response.data.products);
-      }
+      const response = await api.get('/products');
+      if (response.data.success) setProducts(response.data.products);
     } catch (error) {
       console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
-      const response = await api.get('/admin/orders', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.data.success) {
-        setOrders(response.data.orders);
-      }
+      const response = await api.get('/admin/orders', { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) setOrders(response.data.orders);
     } catch (error) {
       console.error('Error fetching orders:', error);
     }
+  }, [token]);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      const response = await api.get('/admin/users', { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) setUsers(response.data.users);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetchDashboard();
+    fetchProducts();
+    fetchOrders();
+    fetchUsers();
+  }, [fetchDashboard, fetchOrders, fetchProducts, fetchUsers, isAdmin]);
+
+  const handleInput = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleAddProduct = async (e) => {
+  const buildPayload = () => ({
+    ...formData,
+    price: Number(formData.price),
+    discount: Number(formData.discount || 0),
+    stock: Number(formData.stock || 0),
+    images: formData.images
+      ? formData.images.split(',').map(image => image.trim()).filter(Boolean)
+      : [],
+    size: formData.size
+      ? formData.size.split(',').map(size => size.trim()).filter(Boolean)
+      : ['Free Size']
+  });
+
+  const resetForm = () => {
+    setFormData(emptyProduct);
+    setEditingId(null);
+    setShowForm(false);
+  };
+
+  const handleSubmitProduct = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/admin/products', formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const payload = buildPayload();
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = editingId
+        ? await api.put(`/admin/products/${editingId}`, payload, config)
+        : await api.post('/admin/products', payload, config);
+
       if (response.data.success) {
-        alert('Product added successfully');
+        resetForm();
         fetchProducts();
-        setShowAddProduct(false);
-        setFormData({
-          name: '', description: '', category: 'Silk Sarees',
-          price: '', discount: '0', fabricType: '', color: '', stock: ''
-        });
+        fetchDashboard();
       }
     } catch (error) {
-      alert('Error adding product: ' + error.message);
+      alert(error.response?.data?.message || 'Unable to save product');
     }
   };
 
+  const startEdit = (product) => {
+    setEditingId(product._id);
+    setShowForm(true);
+    setFormData({
+      name: product.name || '',
+      description: product.description || '',
+      category: product.category || 'Silk Sarees',
+      price: product.price || '',
+      discount: product.discount || '0',
+      fabricType: product.fabricType || '',
+      color: product.color || '',
+      images: product.images?.join(', ') || '',
+      stock: product.stock || '',
+      size: product.size?.join(', ') || 'Free Size'
+    });
+  };
+
   const handleDeleteProduct = async (id) => {
-    if (!window.confirm('Are you sure?')) return;
+    if (!window.confirm('Delete this product?')) return;
     try {
-      const response = await api.delete(`/admin/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.delete(`/admin/products/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) {
-        alert('Product deleted');
         fetchProducts();
+        fetchDashboard();
       }
     } catch (error) {
-      alert('Error deleting product');
+      alert(error.response?.data?.message || 'Unable to delete product');
     }
   };
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
-      const response = await api.put(
-        `/admin/orders/${orderId}/status`,
-        { orderStatus: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.put(`/admin/orders/${orderId}/status`, { orderStatus: newStatus }, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) {
-        alert('Order status updated');
         fetchOrders();
+        fetchDashboard();
       }
     } catch (error) {
-      alert('Error updating order');
+      alert(error.response?.data?.message || 'Unable to update order');
     }
   };
 
+  const categories = ['Silk Sarees', 'Cotton Sarees', 'Wedding Sarees', 'Designer Sarees', 'Party Wear Sarees', 'Traditional Sarees'];
+  const tabs = ['dashboard', 'products', 'orders', 'users'];
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="fixed left-0 top-0 w-64 h-screen bg-olive-dark text-white shadow-lg">
-        <div className="p-6 border-b border-olive">
-          <h1 className="text-2xl font-luxury font-bold">KRUTHANYA Admin</h1>
-        </div>
-        <nav className="mt-8 space-y-4 px-4">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`w-full text-left px-4 py-2 rounded ${
-              activeTab === 'dashboard' ? 'bg-olive' : 'hover:bg-olive-dark'
-            }`}
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={() => setActiveTab('products')}
-            className={`w-full text-left px-4 py-2 rounded ${
-              activeTab === 'products' ? 'bg-olive' : 'hover:bg-olive-dark'
-            }`}
-          >
-            Products
-          </button>
-          <button
-            onClick={() => setActiveTab('orders')}
-            className={`w-full text-left px-4 py-2 rounded ${
-              activeTab === 'orders' ? 'bg-olive' : 'hover:bg-olive-dark'
-            }`}
-          >
-            Orders
-          </button>
-        </nav>
-      </div>
-
-      {/* Main Content */}
-      <div className="ml-64 p-8">
-        {/* Dashboard */}
-        {activeTab === 'dashboard' && stats && (
+    <div className="min-h-screen luxury-surface">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-olive-dark mb-8">Dashboard</h1>
+            <p className="text-gold-soft text-sm uppercase">Seller Console</p>
+            <h1 className="text-3xl font-luxury text-soft-white">KRUTHANYA Admin</h1>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {tabs.map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded capitalize ${activeTab === tab ? 'bg-gold text-midnight' : 'border border-gold/30 text-gold-soft'}`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white rounded-lg p-6 shadow">
-                <p className="text-gray-600 text-sm">Total Products</p>
-                <p className="text-3xl font-bold text-olive-dark">{stats.totalProducts}</p>
-              </div>
-              <div className="bg-white rounded-lg p-6 shadow">
-                <p className="text-gray-600 text-sm">Total Users</p>
-                <p className="text-3xl font-bold text-olive-dark">{stats.totalUsers}</p>
-              </div>
-              <div className="bg-white rounded-lg p-6 shadow">
-                <p className="text-gray-600 text-sm">Total Orders</p>
-                <p className="text-3xl font-bold text-olive-dark">{stats.totalOrders}</p>
-              </div>
-              <div className="bg-white rounded-lg p-6 shadow">
-                <p className="text-gray-600 text-sm">Total Revenue</p>
-                <p className="text-3xl font-bold text-olive-dark">
-                  {formatPrice(stats.totalRevenue)}
-                </p>
-              </div>
+        {activeTab === 'dashboard' && (
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              {[
+                ['Products', stats?.totalProducts || 0],
+                ['Users', stats?.totalUsers || 0],
+                ['Orders', stats?.totalOrders || 0],
+                ['Revenue', formatPrice(stats?.totalRevenue || 0)]
+              ].map(([label, value]) => (
+                <div key={label} className="glass-panel rounded-lg p-6">
+                  <p className="text-soft-white/60 text-sm">{label}</p>
+                  <p className="text-3xl font-bold text-gold-soft mt-2">{value}</p>
+                </div>
+              ))}
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow">
-              <h2 className="text-xl font-bold text-olive-dark mb-4">Recent Orders</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-2">Order ID</th>
-                      <th className="text-left p-2">Customer</th>
-                      <th className="text-left p-2">Amount</th>
-                      <th className="text-left p-2">Status</th>
+            <div className="glass-panel rounded-lg p-6 overflow-x-auto">
+              <h2 className="text-xl font-bold text-gold-soft mb-4">Recent Orders</h2>
+              <table className="w-full min-w-[680px]">
+                <thead className="text-soft-white/60">
+                  <tr className="border-b border-gold/20">
+                    <th className="text-left p-3">Order</th>
+                    <th className="text-left p-3">Customer</th>
+                    <th className="text-left p-3">Amount</th>
+                    <th className="text-left p-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats?.recentOrders?.map(order => (
+                    <tr key={order._id} className="border-b border-gold/10">
+                      <td className="p-3 text-sm">{order._id.slice(0, 8)}</td>
+                      <td className="p-3">{order.userId?.firstName} {order.userId?.lastName}</td>
+                      <td className="p-3">{formatPrice(order.totalPrice)}</td>
+                      <td className="p-3 text-gold-soft capitalize">{order.orderStatus}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {stats.recentOrders?.map(order => (
-                      <tr key={order._id} className="border-b">
-                        <td className="p-2 text-sm">{order._id.slice(0, 8)}</td>
-                        <td className="p-2 text-sm">{order.userId?.firstName} {order.userId?.lastName}</td>
-                        <td className="p-2 text-sm">{formatPrice(order.totalPrice)}</td>
-                        <td className="p-2 text-sm font-bold">{order.orderStatus}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
-        {/* Products */}
         {activeTab === 'products' && (
           <div>
-            <div className="flex justify-between items-center mb-8">
-              <h1 className="text-3xl font-bold text-olive-dark">Products</h1>
-              <button
-                onClick={() => setShowAddProduct(!showAddProduct)}
-                className="btn-primary"
-              >
-                {showAddProduct ? 'Cancel' : 'Add Product'}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-luxury text-gold-soft">Products</h2>
+              <button onClick={() => setShowForm(true)} className="btn-primary flex items-center gap-2">
+                <FaPlus /> Add Product
               </button>
             </div>
 
-            {showAddProduct && (
-              <form onSubmit={handleAddProduct} className="bg-white rounded-lg p-6 mb-8">
-                <h2 className="text-xl font-bold text-olive-dark mb-4">Add New Product</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required
-                    className="col-span-2 px-4 py-2 border rounded"
-                  />
-                  <textarea
-                    placeholder="Description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    required
-                    className="col-span-2 px-4 py-2 border rounded"
-                  />
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="px-4 py-2 border rounded"
-                  >
-                    <option>Silk Sarees</option>
-                    <option>Cotton Sarees</option>
-                    <option>Wedding Sarees</option>
-                    <option>Designer Sarees</option>
-                    <option>Party Wear Sarees</option>
-                    <option>Traditional Sarees</option>
-                  </select>
-                  <input
-                    type="number"
-                    placeholder="Price"
-                    value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: e.target.value})}
-                    required
-                    className="px-4 py-2 border rounded"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Discount %"
-                    value={formData.discount}
-                    onChange={(e) => setFormData({...formData, discount: e.target.value})}
-                    className="px-4 py-2 border rounded"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Fabric Type"
-                    value={formData.fabricType}
-                    onChange={(e) => setFormData({...formData, fabricType: e.target.value})}
-                    required
-                    className="px-4 py-2 border rounded"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Color"
-                    value={formData.color}
-                    onChange={(e) => setFormData({...formData, color: e.target.value})}
-                    required
-                    className="px-4 py-2 border rounded"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Stock"
-                    value={formData.stock}
-                    onChange={(e) => setFormData({...formData, stock: e.target.value})}
-                    required
-                    className="px-4 py-2 border rounded"
-                  />
+            {showForm && (
+              <form onSubmit={handleSubmitProduct} className="glass-panel rounded-lg p-6 mb-8">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold text-gold-soft">{editingId ? 'Edit Product' : 'Add Product'}</h3>
+                  <button type="button" onClick={resetForm} className="text-soft-white/70"><FaTimes /></button>
                 </div>
-                <button type="submit" className="btn-primary mt-4">Add Product</button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input required placeholder="Name" value={formData.name} onChange={(e) => handleInput('name', e.target.value)} className="md:col-span-2 px-4 py-2 rounded bg-black/30 border border-gold/20" />
+                  <textarea required placeholder="Description" value={formData.description} onChange={(e) => handleInput('description', e.target.value)} className="md:col-span-2 px-4 py-2 rounded bg-black/30 border border-gold/20 min-h-24" />
+                  <select value={formData.category} onChange={(e) => handleInput('category', e.target.value)} className="px-4 py-2 rounded bg-black/30 border border-gold/20">
+                    {categories.map(category => <option key={category}>{category}</option>)}
+                  </select>
+                  <input required type="number" placeholder="Price" value={formData.price} onChange={(e) => handleInput('price', e.target.value)} className="px-4 py-2 rounded bg-black/30 border border-gold/20" />
+                  <input type="number" placeholder="Discount %" value={formData.discount} onChange={(e) => handleInput('discount', e.target.value)} className="px-4 py-2 rounded bg-black/30 border border-gold/20" />
+                  <input required placeholder="Fabric Type" value={formData.fabricType} onChange={(e) => handleInput('fabricType', e.target.value)} className="px-4 py-2 rounded bg-black/30 border border-gold/20" />
+                  <input required placeholder="Color" value={formData.color} onChange={(e) => handleInput('color', e.target.value)} className="px-4 py-2 rounded bg-black/30 border border-gold/20" />
+                  <input required type="number" placeholder="Stock" value={formData.stock} onChange={(e) => handleInput('stock', e.target.value)} className="px-4 py-2 rounded bg-black/30 border border-gold/20" />
+                  <input placeholder="Image URLs, comma separated" value={formData.images} onChange={(e) => handleInput('images', e.target.value)} className="md:col-span-2 px-4 py-2 rounded bg-black/30 border border-gold/20" />
+                  <input placeholder="Sizes, comma separated" value={formData.size} onChange={(e) => handleInput('size', e.target.value)} className="md:col-span-2 px-4 py-2 rounded bg-black/30 border border-gold/20" />
+                </div>
+                <button type="submit" className="btn-primary mt-4 flex items-center gap-2">
+                  <FaSave /> {editingId ? 'Save Product' : 'Add Product'}
+                </button>
               </form>
             )}
 
-            <div className="bg-white rounded-lg shadow overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-100 border-b">
-                    <th className="text-left p-4">Name</th>
+            <div className="glass-panel rounded-lg overflow-x-auto">
+              <table className="w-full min-w-[760px]">
+                <thead className="text-soft-white/60">
+                  <tr className="border-b border-gold/20">
+                    <th className="text-left p-4">Product</th>
                     <th className="text-left p-4">Category</th>
                     <th className="text-left p-4">Price</th>
                     <th className="text-left p-4">Stock</th>
-                    <th className="text-left p-4">Action</th>
+                    <th className="text-left p-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {products.map(product => (
-                    <tr key={product._id} className="border-b">
+                    <tr key={product._id} className="border-b border-gold/10">
                       <td className="p-4">{product.name}</td>
                       <td className="p-4">{product.category}</td>
                       <td className="p-4">{formatPrice(product.price)}</td>
                       <td className="p-4">{product.stock}</td>
-                      <td className="p-4">
-                        <button
-                          onClick={() => handleDeleteProduct(product._id)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          Delete
-                        </button>
+                      <td className="p-4 flex gap-3">
+                        <button onClick={() => startEdit(product)} className="text-gold-soft" aria-label="Edit"><FaEdit /></button>
+                        <button onClick={() => handleDeleteProduct(product._id)} className="text-red-300" aria-label="Delete"><FaTrash /></button>
                       </td>
                     </tr>
                   ))}
@@ -337,46 +287,65 @@ const Admin = () => {
           </div>
         )}
 
-        {/* Orders */}
         {activeTab === 'orders' && (
-          <div>
-            <h1 className="text-3xl font-bold text-olive-dark mb-8">Orders</h1>
-
-            <div className="bg-white rounded-lg shadow overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-100 border-b">
-                    <th className="text-left p-4">Order ID</th>
-                    <th className="text-left p-4">Customer</th>
-                    <th className="text-left p-4">Amount</th>
-                    <th className="text-left p-4">Status</th>
-                    <th className="text-left p-4">Action</th>
+          <div className="glass-panel rounded-lg overflow-x-auto">
+            <table className="w-full min-w-[760px]">
+              <thead className="text-soft-white/60">
+                <tr className="border-b border-gold/20">
+                  <th className="text-left p-4">Order</th>
+                  <th className="text-left p-4">Customer</th>
+                  <th className="text-left p-4">Amount</th>
+                  <th className="text-left p-4">Payment</th>
+                  <th className="text-left p-4">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map(order => (
+                  <tr key={order._id} className="border-b border-gold/10">
+                    <td className="p-4 text-sm">{order._id.slice(0, 8)}</td>
+                    <td className="p-4">{order.userId?.firstName} {order.userId?.lastName}</td>
+                    <td className="p-4">{formatPrice(order.totalPrice)}</td>
+                    <td className="p-4 capitalize">{order.paymentStatus}</td>
+                    <td className="p-4">
+                      <select value={order.orderStatus} onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)} className="px-3 py-2 bg-black/30 border border-gold/20 rounded">
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {orders.map(order => (
-                    <tr key={order._id} className="border-b">
-                      <td className="p-4 text-sm">{order._id.slice(0, 8)}</td>
-                      <td className="p-4">{order.userId?.firstName} {order.userId?.lastName}</td>
-                      <td className="p-4">{formatPrice(order.totalPrice)}</td>
-                      <td className="p-4">
-                        <select
-                          value={order.orderStatus}
-                          onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)}
-                          className="px-3 py-1 border rounded text-sm"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="confirmed">Confirmed</option>
-                          <option value="shipped">Shipped</option>
-                          <option value="delivered">Delivered</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {activeTab === 'users' && (
+          <div className="glass-panel rounded-lg overflow-x-auto">
+            <table className="w-full min-w-[680px]">
+              <thead className="text-soft-white/60">
+                <tr className="border-b border-gold/20">
+                  <th className="text-left p-4">Name</th>
+                  <th className="text-left p-4">Email</th>
+                  <th className="text-left p-4">Phone</th>
+                  <th className="text-left p-4">Role</th>
+                  <th className="text-left p-4">Joined</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map(user => (
+                  <tr key={user._id} className="border-b border-gold/10">
+                    <td className="p-4">{user.firstName} {user.lastName}</td>
+                    <td className="p-4">{user.email}</td>
+                    <td className="p-4">{user.phone}</td>
+                    <td className="p-4 capitalize text-gold-soft">{user.role}</td>
+                    <td className="p-4">{new Date(user.createdAt).toLocaleDateString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

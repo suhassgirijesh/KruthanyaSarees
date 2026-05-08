@@ -26,7 +26,7 @@ const Features = () => {
   ];
 
   return (
-    <section className="bg-cream py-12">
+    <section className="bg-royal-green-dark py-12 text-soft-white">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {features.map((feature, idx) => {

@@ -3,45 +3,44 @@ import { Link } from 'react-router-dom';
 
 const HeroBanner = () => {
   return (
-    <div className="relative h-96 md:h-screen bg-gradient-to-r from-olive-dark to-olive overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-pattern"></div>
+    <section className="relative min-h-[82vh] luxury-surface overflow-hidden">
+      <div className="absolute inset-0 opacity-30">
+        <div className="h-full w-full bg-[linear-gradient(115deg,transparent_0%,rgba(201,166,70,0.12)_22%,transparent_45%,rgba(248,245,238,0.08)_64%,transparent_100%)]" />
       </div>
 
-      {/* Content */}
-      <div className="relative h-full flex items-center justify-between max-w-7xl mx-auto px-4">
-        <div className="flex-1">
-          <h1 className="text-white font-luxury text-5xl md:text-7xl font-bold mb-4">
-            Timeless <br /> Elegance
-          </h1>
-          <p className="text-white text-lg md:text-2xl mb-8 opacity-90">
-            Experience the grace and charm of premium sarees
+      <div className="relative max-w-7xl mx-auto px-4 min-h-[82vh] grid lg:grid-cols-[1fr_0.9fr] items-center gap-10 py-12">
+        <div>
+          <p className="uppercase text-gold-soft text-xs mb-5">
+            Handpicked luxury drapes
           </p>
-          <div className="flex gap-4">
-            <Link to="/products" className="btn-secondary">
-              Shop Now
+          <h1 className="text-soft-white font-luxury text-5xl md:text-7xl font-bold mb-5 leading-tight">
+            KRUTHANYA SAREES
+          </h1>
+          <p className="text-soft-white/75 text-lg md:text-2xl mb-8 max-w-2xl">
+            Cinematic silks, graceful cottons, and wedding heirlooms crafted for celebrations that linger.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link to="/products" className="btn-primary">
+              Shop Collection
             </Link>
-            <Link to="/about" className="btn-outline text-white border-white hover:bg-white">
-              Learn More
+            <Link to="/products?category=Wedding%20Sarees" className="btn-outline">
+              Cotton Edition
             </Link>
           </div>
         </div>
 
-        {/* Hero Image */}
-        <div className="hidden lg:flex flex-1 justify-center items-center">
-          <div className="relative">
-            <div className="w-80 h-96 bg-gradient-to-br from-beige to-cream rounded-lg shadow-2xl flex items-center justify-center">
-              <span className="text-9xl">👗</span>
+        <div className="hidden lg:block">
+          <div className="relative aspect-[4/5] rounded-lg overflow-hidden border border-gold/30 shadow-2xl">
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,#5b1020_0%,#170b0b_32%,#c9a646_33%,#c9a646_36%,#10100f_37%,#111_62%,#7a1230_100%)]" />
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-[repeating-linear-gradient(90deg,rgba(248,245,238,0.16)_0_1px,transparent_1px_18px)]" />
+            <div className="absolute inset-8 border border-gold/40 rounded-lg" />
+            <div className="absolute bottom-8 left-8 right-8">
+              <p className="text-gold-soft font-luxury text-3xl">Banarasi glow, modern poise.</p>
             </div>
-            <div className="absolute -bottom-4 -right-4 w-64 h-64 bg-beige opacity-20 rounded-full blur-3xl"></div>
           </div>
         </div>
       </div>
-
-      {/* Decorative Elements */}
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full blur-3xl"></div>
-    </div>
+    </section>
   );
 };
 

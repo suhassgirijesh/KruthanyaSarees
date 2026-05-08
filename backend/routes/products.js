@@ -1,32 +1,28 @@
-﻿const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Product = require('../models/Product');
+const {
+  getAllProducts,
+  getProductById,
+  getFeaturedProducts,
+  getTrendingProducts,
+  getNewArrivals,
+  getBestSellers,
+  getProductsByCategory,
+  addReview
+} = require("../controllers/productController");
+const { protect } = require("../middleware/auth");
 
-router.get('/test', (req, res) => {
-  console.log('Route hit: /api/products/test');
-  return res.status(200).json({
-    success: true,
-    message: 'Products route is working'
-  });
+router.get("/test", (req, res) => {
+  res.json({ success: true, message: "Products route working" });
 });
 
-router.get('/', async (req, res) => {
-  try {
-    const products = await Product.find();
-    return res.status(200).json({
-      success: true,
-      count: products.length,
-      data: products
-    });
-  } catch (error) {
-    console.error('Failed to fetch products:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error while fetching products'
-    });
-  }
-});
-
-console.log('Loaded /api/products router');
+router.get("/", getAllProducts);
+router.get("/featured", getFeaturedProducts);
+router.get("/trending", getTrendingProducts);
+router.get("/new-arrivals", getNewArrivals);
+router.get("/best-sellers", getBestSellers);
+router.get("/category/:category", getProductsByCategory);
+router.get("/:id", getProductById);
+router.post("/:id/reviews", protect, addReview);
 
 module.exports = router;

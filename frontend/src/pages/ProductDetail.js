@@ -13,7 +13,6 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [newReview, setNewReview] = useState({ rating: 5, comment: '' });
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -44,26 +43,31 @@ const ProductDetail = () => {
   const finalPrice = calculateDiscount(product.price, product.discount);
   const taxation = (finalPrice * 18) / 100;
 
-  const handleAddToCart = () => {
-    addToCart(product._id, quantity);
+  const handleAddToCart = async () => {
+    await addToCart(product._id, quantity);
     alert('Product added to cart!');
   };
 
+  const handleBuyNow = async () => {
+    await addToCart(product._id, quantity);
+    navigate('/checkout');
+  };
+
   return (
-    <div className="min-h-screen bg-cream py-12">
+    <div className="min-h-screen luxury-surface py-12">
       <div className="max-w-7xl mx-auto px-4">
         {/* Breadcrumb */}
         <div className="mb-8 text-sm">
-          <span className="text-gray-600">Home / Products / </span>
-          <span className="text-olive-dark font-bold">{product.category}</span>
+          <span className="text-soft-white/60">Home / Products / </span>
+          <span className="text-gold-soft font-bold">{product.category}</span>
         </div>
 
         {/* Product */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
           {/* Images */}
           <div>
-            <div className="bg-white rounded-lg overflow-hidden mb-4">
-              <div className="h-96 flex items-center justify-center bg-gray-100">
+            <div className="glass-panel rounded-lg overflow-hidden mb-4">
+              <div className="h-96 flex items-center justify-center bg-black/30">
                 {product.images && product.images[selectedImage] ? (
                   <img
                     src={product.images[selectedImage]}
@@ -95,11 +99,11 @@ const ProductDetail = () => {
 
           {/* Details */}
           <div>
-            <h1 className="text-4xl font-luxury text-olive-dark mb-4">{product.name}</h1>
+            <h1 className="text-4xl font-luxury text-gold-soft mb-4">{product.name}</h1>
 
             {/* Category & Rating */}
             <div className="flex items-center gap-4 mb-4">
-              <span className="bg-beige text-olive-dark px-3 py-1 rounded-full text-sm">
+              <span className="bg-gold/20 text-gold-soft px-3 py-1 rounded-full text-sm">
                 {product.category}
               </span>
               {product.rating > 0 && (
@@ -113,9 +117,9 @@ const ProductDetail = () => {
             </div>
 
             {/* Price */}
-            <div className="bg-white rounded-lg p-6 mb-6">
+            <div className="glass-panel rounded-lg p-6 mb-6">
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-4xl font-bold text-olive-dark">
+                <span className="text-4xl font-bold text-gold-soft">
                   {formatPrice(finalPrice)}
                 </span>
                 {product.discount > 0 && (
@@ -129,34 +133,34 @@ const ProductDetail = () => {
                   </>
                 )}
               </div>
-              <p className="text-gray-600 text-sm">+ {formatPrice(taxation)} GST</p>
+              <p className="text-soft-white/60 text-sm">+ {formatPrice(taxation)} GST</p>
             </div>
 
             {/* Details */}
-            <div className="bg-white rounded-lg p-6 mb-6 space-y-4">
+            <div className="glass-panel rounded-lg p-6 mb-6 space-y-4">
               <div>
-                <h3 className="font-bold text-olive-dark mb-2">Fabric Type</h3>
-                <p className="text-gray-600">{product.fabricType}</p>
+                <h3 className="font-bold text-gold-soft mb-2">Fabric Type</h3>
+                <p className="text-soft-white/70">{product.fabricType}</p>
               </div>
               <div>
-                <h3 className="font-bold text-olive-dark mb-2">Color</h3>
-                <p className="text-gray-600">{product.color}</p>
+                <h3 className="font-bold text-gold-soft mb-2">Color</h3>
+                <p className="text-soft-white/70">{product.color}</p>
               </div>
               <div>
-                <h3 className="font-bold text-olive-dark mb-2">Description</h3>
-                <p className="text-gray-600">{product.description}</p>
+                <h3 className="font-bold text-gold-soft mb-2">Description</h3>
+                <p className="text-soft-white/70">{product.description}</p>
               </div>
             </div>
 
             {/* Size Selection */}
             {product.size && product.size.length > 0 && (
-              <div className="bg-white rounded-lg p-6 mb-6">
-                <h3 className="font-bold text-olive-dark mb-4">Select Size</h3>
+              <div className="glass-panel rounded-lg p-6 mb-6">
+                <h3 className="font-bold text-gold-soft mb-4">Select Size</h3>
                 <div className="flex flex-wrap gap-2">
                   {product.size.map((size) => (
                     <button
                       key={size}
-                      className="px-4 py-2 border-2 border-gray-300 rounded hover:border-olive-dark transition"
+                      className="px-4 py-2 border border-gold/30 rounded hover:border-gold transition"
                     >
                       {size}
                     </button>
@@ -168,18 +172,18 @@ const ProductDetail = () => {
             {/* Quantity & Action Buttons */}
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <label className="font-bold text-olive-dark">Quantity:</label>
-                <div className="flex items-center gap-2 border border-gray-300 rounded">
+                <label className="font-bold text-gold-soft">Quantity:</label>
+                <div className="flex items-center gap-2 border border-gold/30 rounded">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-2 hover:bg-gray-100"
+                    className="px-3 py-2 hover:bg-gold/10"
                   >
                     −
                   </button>
                   <span className="px-4 py-2">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-2 hover:bg-gray-100"
+                    className="px-3 py-2 hover:bg-gold/10"
                   >
                     +
                   </button>
@@ -199,15 +203,15 @@ const ProductDetail = () => {
               </div>
 
               <button
-                onClick={() => navigate('/checkout')}
-                className="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition"
+                onClick={handleBuyNow}
+                className="w-full bg-soft-white text-midnight py-3 rounded-lg font-bold hover:bg-gold-soft transition"
               >
                 Buy Now
               </button>
             </div>
 
             {/* Info */}
-            <div className="mt-8 space-y-4 text-sm text-gray-600">
+            <div className="mt-8 space-y-4 text-sm text-soft-white/70">
               <div className="flex items-center gap-3">
                 <FaTruck /> Free delivery on orders above ₹500
               </div>
@@ -224,7 +228,7 @@ const ProductDetail = () => {
             <h2 className="section-title">Customer Reviews</h2>
             <div className="space-y-4">
               {product.reviews.map((review, idx) => (
-                <div key={idx} className="bg-white rounded-lg p-6 border border-gray-200">
+                <div key={idx} className="glass-panel rounded-lg p-6">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-bold text-olive-dark">{review.userName}</h4>
                     <div className="flex text-yellow-400">{'⭐'.repeat(review.rating)}</div>

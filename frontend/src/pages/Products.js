@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { useCart } from '../context/CartContext';
 import api from '../utils/api';
 
 const Products = () => {
   const [searchParams] = useSearchParams();
+  const { category } = useParams();
+  const searchQuery = searchParams.get('search') || '';
+  const categoryQuery = searchParams.get('category') || '';
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    category: searchParams.get('category') || '',
+    category: category || categoryQuery,
     minPrice: searchParams.get('minPrice') || '',
     maxPrice: searchParams.get('maxPrice') || '',
-    search: searchParams.get('search') || '',
+    search: searchQuery,
     sort: ''
   });
   const { addToCart } = useCart();
@@ -27,10 +30,14 @@ const Products = () => {
   ];
 
   useEffect(() => {
-    fetchProducts();
-  }, [filters]);
+    setFilters(prev => ({
+      ...prev,
+      category: category || categoryQuery,
+      search: searchQuery
+    }));
+  }, [category, categoryQuery, searchQuery]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -49,31 +56,35 @@ const Products = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleFilterChange = (name, value) => {
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
   return (
-    <div className="min-h-screen bg-cream py-12">
+    <div className="min-h-screen luxury-surface py-12">
       <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-3xl font-luxury text-olive-dark mb-8">
+        <h1 className="text-3xl font-luxury text-gold-soft mb-8">
           {filters.search ? `Search Results for "${filters.search}"` : 'All Sarees'}
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Filters */}
-          <div className="bg-white rounded-lg p-6 h-fit">
-            <h2 className="text-lg font-bold text-olive-dark mb-6">Filter</h2>
+          <div className="glass-panel rounded-lg p-6 h-fit">
+            <h2 className="text-lg font-bold text-gold-soft mb-6">Filter</h2>
 
             {/* Category */}
             <div className="mb-6">
-              <h3 className="font-bold text-gray-700 mb-3">Category</h3>
+              <h3 className="font-bold text-soft-white mb-3">Category</h3>
               <select
                 value={filters.category}
                 onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border border-gold/20 rounded-lg bg-black/30 text-soft-white"
               >
                 <option value="">All Categories</option>
                 {categories.map(cat => (
@@ -84,32 +95,32 @@ const Products = () => {
 
             {/* Price Range */}
             <div className="mb-6">
-              <h3 className="font-bold text-gray-700 mb-3">Price Range</h3>
+              <h3 className="font-bold text-soft-white mb-3">Price Range</h3>
               <div className="space-y-2">
                 <input
                   type="number"
                   placeholder="Min Price"
                   value={filters.minPrice}
                   onChange={(e) => handleFilterChange('minPrice', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gold/20 rounded-lg bg-black/30 text-sm"
                 />
                 <input
                   type="number"
                   placeholder="Max Price"
                   value={filters.maxPrice}
                   onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gold/20 rounded-lg bg-black/30 text-sm"
                 />
               </div>
             </div>
 
             {/* Sort */}
             <div className="mb-6">
-              <h3 className="font-bold text-gray-700 mb-3">Sort By</h3>
+              <h3 className="font-bold text-soft-white mb-3">Sort By</h3>
               <select
                 value={filters.sort}
                 onChange={(e) => handleFilterChange('sort', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border border-gold/20 rounded-lg bg-black/30 text-soft-white"
               >
                 <option value="">Default</option>
                 <option value="price_asc">Price: Low to High</option>
@@ -134,7 +145,7 @@ const Products = () => {
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-gray-200 h-80 rounded-lg animate-pulse"></div>
+                  <div key={i} className="bg-white/10 h-80 rounded-lg animate-pulse"></div>
                 ))}
               </div>
             ) : products.length > 0 ? (
@@ -152,7 +163,7 @@ const Products = () => {
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-gray-600 text-lg">No products found</p>
+                <p className="text-soft-white/70 text-lg">No products found</p>
               </div>
             )}
           </div>
