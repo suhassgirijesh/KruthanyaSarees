@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../components/BackButton';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
@@ -243,9 +244,9 @@ const Checkout = () => {
 
   return (
     <div className="min-h-screen luxury-surface py-12">
-
       <div className="max-w-7xl mx-auto px-4">
-
+        <BackButton label="Back to Cart" />
+        
         <h1 className="text-3xl font-luxury text-gold-soft mb-8">
           Checkout
         </h1>

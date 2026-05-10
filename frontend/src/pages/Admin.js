@@ -2,7 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FaEdit, FaPlus, FaSave, FaTimes, FaTrash } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
-import { formatPrice } from '../utils/helpers';
+import { formatPrice, parseImageInput } from '../utils/helpers';
+import BackButton from '../components/BackButton';
 
 const emptyProduct = {
   name: '',
@@ -81,9 +82,7 @@ const Admin = () => {
     price: Number(formData.price),
     discount: Number(formData.discount || 0),
     stock: Number(formData.stock || 0),
-    images: formData.images
-      ? formData.images.split(',').map(image => image.trim()).filter(Boolean)
-      : [],
+    images: formData.images ? parseImageInput(formData.images) : [],
     size: formData.size
       ? formData.size.split(',').map(size => size.trim()).filter(Boolean)
       : ['Free Size']
@@ -156,12 +155,14 @@ const Admin = () => {
     }
   };
 
-  const categories = ['Silk Sarees', 'Cotton Sarees', 'Wedding Sarees', 'Designer Sarees', 'Party Wear Sarees', 'Traditional Sarees'];
+  const categories = ['kanchipuram Silk Sarees', 'Cotton Sarees', 'Satin silk Sarees', 'Georgette Sarees', 'Semi Crape Sarees', 'Traditional Sarees'];
   const tabs = ['dashboard', 'products', 'orders', 'users'];
 
   return (
     <div className="min-h-screen luxury-surface">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <BackButton label="Back to Home" />
+        
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
             <p className="text-gold-soft text-sm uppercase">Seller Console</p>

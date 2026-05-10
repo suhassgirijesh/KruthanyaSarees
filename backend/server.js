@@ -22,6 +22,12 @@ app.use(cors({
 // ======================
 app.use(express.json());
 
+// ======================
+// STATIC FILES
+// ======================
+app.use('/uploads', express.static('uploads'));
+app.use('/images', express.static('public/images'));
+
 
 // ======================
 // MONGODB CONNECTION

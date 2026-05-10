@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaMinus, FaPlus, FaTrash } from 'react-icons/fa';
+import BackButton from '../components/BackButton';
 import { useCart } from '../context/CartContext';
-import { formatPrice } from '../utils/helpers';
+import { formatPrice, normalizeImageEntries } from '../utils/helpers';
 
 const Cart = () => {
   const { cartItems, cartTotal, removeFromCart, updateQuantity } = useCart();
@@ -11,14 +12,31 @@ const Cart = () => {
   const taxAmount = (cartTotal * 18) / 100;
   const finalTotal = cartTotal + taxAmount;
 
+  // Get image URL - use database URL directly or construct from backend
+  const getImageUrl = (imageName) => {
+    if (!imageName) return null;
+    // If it's already a full URL, use it directly
+    if (imageName.startsWith('http')) return imageName;
+    // Otherwise, serve from backend static files
+    return `${process.env.REACT_APP_API_URL?.replace('/api', '')}/images/${imageName}`;
+  };
+
+  // Get fallback image URL
+  const getFallbackImage = () => {
+    return `${process.env.REACT_APP_API_URL?.replace('/api', '')}/images/placeholder.svg`;
+  };
+
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen luxury-surface py-16">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <div className="glass-panel rounded-lg p-10">
-            <h1 className="text-3xl font-luxury text-gold-soft mb-4">Your Cart is Empty</h1>
-            <p className="text-soft-white/70 mb-8">Add a saree you love and your checkout will appear here.</p>
-            <Link to="/products" className="btn-primary">Continue Shopping</Link>
+        <div className="max-w-3xl mx-auto px-4">
+          <BackButton label="Back to Products" />
+          <div className="text-center">
+            <div className="glass-panel rounded-lg p-10">
+              <h1 className="text-3xl font-luxury text-gold-soft mb-4">Your Cart is Empty</h1>
+              <p className="text-soft-white/70 mb-8">Add a saree you love and your checkout will appear here.</p>
+              <Link to="/products" className="btn-primary">Continue Shopping</Link>
+            </div>
           </div>
         </div>
       </div>
@@ -28,6 +46,8 @@ const Cart = () => {
   return (
     <div className="min-h-screen luxury-surface py-12">
       <div className="max-w-7xl mx-auto px-4">
+        <BackButton label="Back to Products" />
+        
         <h1 className="text-3xl font-luxury text-gold-soft mb-8">Shopping Cart</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -39,11 +59,20 @@ const Cart = () => {
               return (
                 <div key={productId} className="glass-panel rounded-lg p-4 md:p-6 flex gap-4 md:gap-6">
                   <div className="w-24 h-24 bg-black/30 rounded flex-shrink-0 overflow-hidden">
-                    {product?.images?.[0] ? (
-                      <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gold-soft font-luxury">KS</div>
-                    )}
+                    <img 
+                      src={normalizeImageEntries(product?.images)[0] ? getImageUrl(normalizeImageEntries(product.images)[0]) : getFallbackImage()} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        if (e.target.src !== getFallbackImage()) {
+                          e.target.src = getFallbackImage();
+                        } else {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }
+                      }}
+                    />
+                    <div className="w-full h-full flex items-center justify-center text-gold-soft font-luxury" style={{ display: 'none' }}>KS</div>
                   </div>
 
                   <div className="flex-1 min-w-0">

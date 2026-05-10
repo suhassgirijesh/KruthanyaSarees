@@ -1,12 +1,17 @@
 import React from 'react';
+import BackButton from '../components/BackButton';
 
 const Wishlist = () => {
   return (
-    <div className="min-h-screen bg-cream py-12">
-      <div className="max-w-7xl mx-auto px-4 text-center">
-        <div className="text-8xl mb-4">❤️</div>
-        <h1 className="text-3xl font-luxury text-olive-dark mb-4">My Wishlist</h1>
-        <p className="text-gray-600 mb-8">Your wishlist is empty. Start adding your favorite sarees!</p>
+    <div className="min-h-screen luxury-surface py-12">
+      <div className="max-w-7xl mx-auto px-4">
+        <BackButton label="Back to Products" />
+        
+        <div className="text-center mt-8">
+          <div className="text-8xl mb-4">❤️</div>
+          <h1 className="text-3xl font-luxury text-gold-soft mb-4">My Wishlist</h1>
+          <p className="text-soft-white/70 mb-8">Your wishlist is empty. Start adding your favorite sarees!</p>
+        </div>
       </div>
     </div>
   );

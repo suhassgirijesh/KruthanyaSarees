@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
+import BackButton from '../components/BackButton';
 import { useCart } from '../context/CartContext';
 import api from '../utils/api';
 
@@ -21,11 +22,11 @@ const Products = () => {
   const { addToCart } = useCart();
 
   const categories = [
-    'Silk Sarees',
+    'kanchipuram Silk Sarees',
     'Cotton Sarees',
-    'Wedding Sarees',
-    'Designer Sarees',
-    'Party Wear Sarees',
+    'Satin silk Sarees',
+    'Georgette Sarees',
+    'Semi Crape Sarees',
     'Traditional Sarees'
   ];
 
@@ -69,6 +70,8 @@ const Products = () => {
   return (
     <div className="min-h-screen luxury-surface py-12">
       <div className="max-w-7xl mx-auto px-4">
+        <BackButton label="Back to Home" />
+        
         <h1 className="text-3xl font-luxury text-gold-soft mb-8">
           {filters.search ? `Search Results for "${filters.search}"` : 'All Sarees'}
         </h1>

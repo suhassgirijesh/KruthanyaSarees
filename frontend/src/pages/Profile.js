@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import BackButton from '../components/BackButton';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 
@@ -50,101 +51,103 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream py-12">
+    <div className="min-h-screen luxury-surface py-12">
       <div className="max-w-2xl mx-auto px-4">
-        <h1 className="text-3xl font-luxury text-olive-dark mb-8">My Profile</h1>
+        <BackButton label="Back to Home" />
+        
+        <h1 className="text-3xl font-luxury text-gold-soft mb-8">My Profile</h1>
 
-        <div className="bg-white rounded-lg p-8">
+        <div className="glass-panel rounded-lg p-8">
           {editing ? (
             <form className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-2">First Name</label>
+                  <label className="block text-sm font-semibold text-soft-white mb-2">First Name</label>
                   <input
                     type="text"
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-4 py-2 border border-gold/20 bg-black/30 rounded-lg text-soft-white focus:outline-none focus:ring-2 focus:ring-gold"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2">Last Name</label>
+                  <label className="block text-sm font-semibold text-soft-white mb-2">Last Name</label>
                   <input
                     type="text"
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-4 py-2 border border-gold/20 bg-black/30 rounded-lg text-soft-white focus:outline-none focus:ring-2 focus:ring-gold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2">Email</label>
+                <label className="block text-sm font-semibold text-soft-white mb-2">Email</label>
                 <input
                   type="email"
                   value={profile?.email}
                   disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100"
+                  className="w-full px-4 py-2 border border-gold/20 bg-black/50 rounded-lg text-soft-white/60"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2">Phone</label>
+                <label className="block text-sm font-semibold text-soft-white mb-2">Phone</label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-2 border border-gold/20 bg-black/30 rounded-lg text-soft-white focus:outline-none focus:ring-2 focus:ring-gold"
                 />
               </div>
 
-              <h2 className="text-lg font-bold text-olive-dark mt-8">Address</h2>
+              <h2 className="text-lg font-bold text-gold-soft mt-8">Address</h2>
 
               <div>
-                <label className="block text-sm font-semibold mb-2">Street</label>
+                <label className="block text-sm font-semibold text-soft-white mb-2">Street</label>
                 <input
                   type="text"
                   name="street"
                   value={formData.address.street}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-2 border border-gold/20 bg-black/30 rounded-lg text-soft-white focus:outline-none focus:ring-2 focus:ring-gold"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-2">City</label>
+                  <label className="block text-sm font-semibold text-soft-white mb-2">City</label>
                   <input
                     type="text"
                     name="city"
                     value={formData.address.city}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-4 py-2 border border-gold/20 bg-black/30 rounded-lg text-soft-white focus:outline-none focus:ring-2 focus:ring-gold"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2">State</label>
+                  <label className="block text-sm font-semibold text-soft-white mb-2">State</label>
                   <input
                     type="text"
                     name="state"
                     value={formData.address.state}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-4 py-2 border border-gold/20 bg-black/30 rounded-lg text-soft-white focus:outline-none focus:ring-2 focus:ring-gold"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2">Zip Code</label>
+                <label className="block text-sm font-semibold text-soft-white mb-2">Zip Code</label>
                 <input
                   type="text"
                   name="zipCode"
                   value={formData.address.zipCode}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-2 border border-gold/20 bg-black/30 rounded-lg text-soft-white focus:outline-none focus:ring-2 focus:ring-gold"
                 />
               </div>
 
@@ -170,25 +173,25 @@ const Profile = () => {
             <div>
               <div className="space-y-4 mb-6">
                 <div>
-                  <p className="text-gray-600 text-sm">Full Name</p>
-                  <p className="text-lg font-semibold text-olive-dark">
+                  <p className="text-soft-white/60 text-sm">Full Name</p>
+                  <p className="text-lg font-semibold text-gold-soft">
                     {profile?.firstName} {profile?.lastName}
                   </p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">Email</p>
-                  <p className="text-lg font-semibold text-olive-dark">{profile?.email}</p>
+                  <p className="text-soft-white/60 text-sm">Email</p>
+                  <p className="text-lg font-semibold text-gold-soft">{profile?.email}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">Phone</p>
-                  <p className="text-lg font-semibold text-olive-dark">{profile?.phone}</p>
+                  <p className="text-soft-white/60 text-sm">Phone</p>
+                  <p className="text-lg font-semibold text-gold-soft">{profile?.phone}</p>
                 </div>
               </div>
 
               {profile?.address && Object.values(profile.address).some(v => v) && (
-                <div className="mb-6 pt-6 border-t">
-                  <h2 className="text-lg font-bold text-olive-dark mb-4">Address</h2>
-                  <p className="text-gray-600">
+                <div className="mb-6 pt-6 border-t border-gold/20">
+                  <h2 className="text-lg font-bold text-gold-soft mb-4">Address</h2>
+                  <p className="text-soft-white/70">
                     {profile.address.street}<br />
                     {profile.address.city}, {profile.address.state} {profile.address.zipCode}
                   </p>

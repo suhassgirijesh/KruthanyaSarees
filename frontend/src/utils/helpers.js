@@ -29,6 +29,66 @@ export const validatePassword = (password) => {
   return password.length >= 6;
 };
 
+export const parseImageInput = (value) => {
+  if (!value) return [];
+
+  const entries = value.split(',').map((item) => item.trim());
+  const results = [];
+  let pendingPrefix = '';
+
+  entries.forEach((entry) => {
+    if (!entry) return;
+
+    if (pendingPrefix) {
+      results.push(`${pendingPrefix},${entry}`);
+      pendingPrefix = '';
+      return;
+    }
+
+    if (entry.startsWith('data:image') && !entry.includes('base64,')) {
+      pendingPrefix = entry;
+      return;
+    }
+
+    results.push(entry);
+  });
+
+  if (pendingPrefix) {
+    results.push(pendingPrefix);
+  }
+
+  return results.filter(Boolean);
+};
+
+export const normalizeImageEntries = (images) => {
+  if (!images) return [];
+  if (!Array.isArray(images)) return [images];
+
+  const normalized = [];
+  let i = 0;
+
+  while (i < images.length) {
+    const current = images[i];
+    const next = images[i + 1];
+
+    if (
+      typeof current === 'string' &&
+      current.startsWith('data:image') &&
+      !current.includes('base64,') &&
+      typeof next === 'string'
+    ) {
+      normalized.push(`${current},${next}`);
+      i += 2;
+      continue;
+    }
+
+    normalized.push(current);
+    i += 1;
+  }
+
+  return normalized.filter(Boolean);
+};
+
 export const getInitials = (firstName, lastName) => {
   return `${firstName?.charAt(0) || ''}${lastName?.charAt(0) || ''}`.toUpperCase();
 };

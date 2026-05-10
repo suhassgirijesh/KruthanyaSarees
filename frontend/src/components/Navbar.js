@@ -79,14 +79,14 @@ const Navbar = () => {
                 <button className="text-gold-soft text-xl hover:text-gold transition" aria-label="Account">
                   <FaUser />
                 </button>
-                <div className="absolute right-0 mt-2 w-52 glass-panel rounded-lg opacity-0 group-hover:opacity-100 transition pointer-events-none group-hover:pointer-events-auto overflow-hidden">
+                <div className="absolute right-0 mt-0 w-52 glass-panel rounded-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 delay-100 group-hover:delay-0 overflow-hidden z-40">
                   <div className="px-4 py-3 border-b border-gold/20 text-sm text-soft-white/70">
                     {user?.firstName || 'Account'}
                   </div>
-                  <Link to="/profile" className="block px-4 py-2 hover:bg-gold/10">Profile</Link>
-                  <Link to="/orders" className="block px-4 py-2 hover:bg-gold/10">My Orders</Link>
-                  {isAdmin && <Link to="/admin" className="block px-4 py-2 hover:bg-gold/10">Admin Dashboard</Link>}
-                  <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gold/10">
+                  <Link to="/profile" className="block px-4 py-2 hover:bg-gold/10 transition">Profile</Link>
+                  <Link to="/orders" className="block px-4 py-2 hover:bg-gold/10 transition">My Orders</Link>
+                  {isAdmin && <Link to="/admin" className="block px-4 py-2 hover:bg-gold/10 transition">Admin Dashboard</Link>}
+                  <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gold/10 transition">
                     Logout
                   </button>
                 </div>
